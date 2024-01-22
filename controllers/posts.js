@@ -1,8 +1,5 @@
-const express = require("express");
 const mongoose = require("mongoose");
-const PostMessage =  require("../models/postMessage");
-
-const router = express.Router();
+const PostMessage = require("../models/postMessage");
 
 exports.getPosts = async (req, res) => {
   try {
@@ -60,18 +57,52 @@ exports.updatePost = async (req, res) => {
   res.json(updatedPost);
 };
 
+// exports.deletePost = async (req, res) => {
+//   const { id } = req.params;
+
+//   if (!mongoose.Types.ObjectId.isValid(id))
+//     return res.status(404).send(`No post with id: ${id}`);
+
+//   await PostMessage.findByIdAndRemove(id);
+
+//   res.json({ message: "Post deleted successfully." });
+// };
+
 exports.deletePost = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No post with id: ${id}`);
 
-  await PostMessage.findByIdAndRemove(id);
+  try {
+    const deletedPost = await PostMessage.findOneAndDelete({ _id: id });
 
-  res.json({ message: "Post deleted successfully." });
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    res.json({ message: "Post deleted successfully." });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
+// exports.likePost = async (req, res) => {
+//   const { id } = req.params;
 
+//   if (!mongoose.Types.ObjectId.isValid(id))
+//     return res.status(404).send(`No post with id: ${id}`);
+
+//   const post = await PostMessage.findById(id);
+
+//   const updatedPost = await PostMessage.findByIdAndUpdate(
+//     id,
+//     { likeCount: post.likeCount + 1 },
+//     { new: true }
+//   );
+
+//   res.json(updatedPost);
+// };
 
 exports.likePost = async (req, res) => {
   const { id } = req.params;
@@ -79,15 +110,22 @@ exports.likePost = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send(`No post with id: ${id}`);
 
-  const post = await PostMessage.findById(id);
+  try {
+    const post = await PostMessage.findById(id);
 
-  const updatedPost = await PostMessage.findByIdAndUpdate(
-    id,
-    { likeCount: post.likeCount + 1 },
-    { new: true }
-  );
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
 
-  res.json(updatedPost);
+    const updatedPost = await PostMessage.findByIdAndUpdate(
+      id,
+      { likeCount: post.likeCount + 1 },
+      { new: true }
+    );
+
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
-
-exports.router;
