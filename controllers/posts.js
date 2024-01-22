@@ -1,11 +1,10 @@
-import express from "express";
-import mongoose from "mongoose";
-
-import PostMessage from "../models/postMessage.js";
+const express = require("express");
+const mongoose = require("mongoose");
+const PostMessage =  require("../models/postMessage");
 
 const router = express.Router();
 
-export const getPosts = async (req, res) => {
+exports.getPosts = async (req, res) => {
   try {
     const postMessages = await PostMessage.find();
 
@@ -15,7 +14,7 @@ export const getPosts = async (req, res) => {
   }
 };
 
-export const getPost = async (req, res) => {
+exports.getPost = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -27,7 +26,7 @@ export const getPost = async (req, res) => {
   }
 };
 
-export const createPost = async (req, res) => {
+exports.createPost = async (req, res) => {
   const { title, message, selectedFile, creator, tags } = req.body;
 
   const newPostMessage = new PostMessage({
@@ -47,7 +46,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-export const updatePost = async (req, res) => {
+exports.updatePost = async (req, res) => {
   const { id } = req.params;
   const { title, message, creator, selectedFile, tags } = req.body;
 
@@ -61,7 +60,7 @@ export const updatePost = async (req, res) => {
   res.json(updatedPost);
 };
 
-export const deletePost = async (req, res) => {
+exports.deletePost = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id))
@@ -74,7 +73,7 @@ export const deletePost = async (req, res) => {
 
 
 
-export const likePost = async (req, res) => {
+exports.likePost = async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id))
@@ -91,4 +90,4 @@ export const likePost = async (req, res) => {
   res.json(updatedPost);
 };
 
-export default router;
+exports.router;

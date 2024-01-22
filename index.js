@@ -1,11 +1,19 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import cors from 'cors';
-
-import postRoutes from './routes/posts.js';
-
+const express = require("express");
 const app = express();
+const bodyParser = require('body-parser');
+const cors = require("cors");
+const postRoutes = require('./routes/posts.js');
+const dotenv = require("dotenv");
+const database = require("./config/database.js")
+
+// Setting up port number
+const PORT = process.env.PORT || 4000;
+
+// Loading environment variables from .env file
+dotenv.config();
+
+// Connecting to database
+database.connect();
 
 app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
@@ -13,11 +21,18 @@ app.use(cors());
 
 app.use('/api/v1/posts', postRoutes);
 
-const CONNECTION_URL = 'mongodb+srv://somnathroy9564:4WudmHjiMUMLeJ2G@cluster0.pr7azmw.mongodb.net/memoriesAppDB';
-const PORT = process.env.PORT || 4000;
+// Testing the server
+app.get("/", (req, res) => {
+	return res.json({
+		success: true,
+		message: "Your server is up and running ...",
+	});
+});
 
-mongoose.connect(CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
-  .catch((error) => console.log(`${error} did not connect`));
 
-mongoose.set('useFindAndModify', false);
+// Listening to the server
+app.listen(PORT, () => {
+	console.log(`App is listening at ${PORT}`);
+});
+
+// End of code.
